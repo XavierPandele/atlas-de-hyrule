@@ -36,7 +36,7 @@
   const uiSaved = ls.get(UIKEY, null);
   const S = {
     view: 'world', floor: null, focus: null, sel: null, age: 'x', night: false,
-    show: { gs: true, hp: true }, hideDone: false, q: '',
+    show: { gs: true, hp: true, bn: true }, hideDone: false, q: '',
     done: new Set(ls.get(KEY, [])), panel: uiSaved ? !!uiSaved.panel : window.innerWidth >= 1100
   };
 
@@ -134,11 +134,12 @@
   const matches = it => {
     if (!S.q) return true;
     const hay = norm([it.title, it.desc, it.remake, ZI[it.zone].name, it.req.map(r => REQ[r]).join(' '), it.night ? 'noche' : '',
-      it.t === 'gs' ? 'skulltula' : 'corazon pieza'].join(' '));
+      { gs: 'skulltula', hp: 'corazon pieza', bn: 'judia magica plantar' }[it.t]].join(' '));
     return norm(S.q).split(/\s+/).every(w => hay.includes(w));
   };
   const visible = it => S.show[it.t] && ageOk(it) && !(S.hideDone && S.done.has(it.id)) && matches(it);
-  const zoneItems = (zid, floor) => ITEMS.filter(i => i.zone === zid && (floor == null || i.floor === floor) && S.show[i.t]);
+  /* los recuentos de zona cuentan coleccionables; las judías son una tarea aparte */
+  const zoneItems = (zid, floor) => ITEMS.filter(i => i.t !== 'bn' && i.zone === zid && (floor == null || i.floor === floor) && S.show[i.t]);
   const tally = list => ({ n: list.length, d: list.filter(i => S.done.has(i.id)).length });
 
   /* ── vista: encuadre, zoom y vuelo ── */
@@ -231,8 +232,9 @@
     if (!visible(it) && S.sel !== it.id) return '';
     const done = S.done.has(it.id);
     const cls = ['mk', it.t, done ? 'done' : '', it.night ? 'nt' : '', S.sel === it.id ? 'sel' : ''].join(' ');
-    const what = it.t === 'gs' ? 'Skulltula dorada' : 'Pieza de corazón';
+    const what = KIND[it.t], needs = it.req.map(r => REQ[r]).join(', ');
     return `<g class="${cls}" data-id="${it.id}" data-x="${x}" data-y="${y}" tabindex="0" role="button" aria-label="${what} ${it.n}: ${esc(it.title)}">` +
+      `<title>${what} ${it.n}: ${esc(it.title)}. Necesitas: ${needs || 'ningún objeto'}</title>` +
       `<circle class="ring" r="19"/><use class="body" href="#m-${it.t}"/>` +
       (it.night ? '<use href="#m-moon" x="11" y="-11"/>' : '') + (done ? '<use href="#m-ok" x="-11" y="-11"/>' : '') +
       `<text class="mkn" y="27">${it.n}</text></g>`;
@@ -313,7 +315,7 @@
   }
 
   function renderTally() {
-    ['gs', 'hp'].forEach(t => {
+    ['gs', 'hp', 'bn'].forEach(t => {
       const all = ITEMS.filter(i => i.t === t), d = all.filter(i => S.done.has(i.id)).length;
       $('#t-' + t).textContent = d;
       $('#b-' + t).style.width = (100 * d / all.length) + '%';
@@ -321,10 +323,37 @@
   }
 
   /* ── ficha emergente ── */
+  const KIND = { gs: 'Skulltula dorada', hp: 'Pieza de corazón', bn: 'Judía mágica' };
   const AGE = { c: ['child', 'Niño'], a: ['adult', 'Adulto'], x: ['', 'Niño o adulto'] };
-  const tagsHTML = it => [`<span class="tag ${AGE[it.age][0]}">${AGE[it.age][1]}</span>`]
-    .concat(it.night ? ['<span class="tag night">Solo de noche</span>'] : [])
-    .concat(it.req.map(r => `<span class="tag">${REQ[r]}</span>`)).join('');
+  /* qué judía hay que haber plantado para cada coleccionable */
+  const BEAN_OF = {};
+  Object.keys(BEAN_GIVES).forEach(b => BEAN_GIVES[b].forEach(id => { BEAN_OF[id] = b; }));
+  const refHTML = id => `<button class="ref ${II[id].t}" data-sel="${id}"><svg viewBox="-17 -16 34 32" aria-hidden="true"><use href="#m-${II[id].t}"/></svg>${KIND[II[id].t].toLowerCase()} n.º ${II[id].n}</button>`;
+  /* Cuándo se puede y qué hace falta. Cada objeto es un botón: al pulsarlo se ve todo lo que lo pide. */
+  function tagsHTML(it) {
+    const needs = it.req.map(r => {
+      const b = r === 'bean' && BEAN_OF[it.id];
+      if (b) {
+        const ok = S.done.has(b);
+        return `<button class="tag req bean ${ok ? 'ok' : 'falta'}" data-sel="${b}" title="Ver dónde se planta">Judía n.º ${II[b].n} plantada de niño: ${ok ? 'ya la tienes' : 'te falta plantarla'}</button>`;
+      }
+      return `<button class="tag req" data-req="${r}" title="Ver todo lo que pide: ${REQ[r]}">${REQ[r]}</button>`;
+    }).join('');
+    return `<span class="tag ${AGE[it.age][0]}">${AGE[it.age][1]}</span>` + (it.night ? '<span class="tag night">Solo de noche</span>' : '') +
+      `<span class="needs"><b>Necesitas</b>${needs || '<span class="nada">ningún objeto</span>'}</span>`;
+  }
+  /* lo que da una judía al volver de adulto */
+  function givesHTML(it) {
+    if (it.t !== 'bn') return '';
+    const g = BEAN_GIVES[it.id];
+    return `<p class="gives">${g ? 'De adulto te lleva a la ' + g.map(refHTML).join(' y a la ')
+      : 'Ninguna de las guías consultadas la relaciona con una skulltula o una pieza de corazón: de adulto es solo un paseo.'}</p>`;
+  }
+  function searchFor(text) {
+    $('#q').value = text; S.q = text;
+    if (!S.panel) togglePanel(true);
+    renderMarks(); renderList(); $('#scroll').scrollTop = 0;
+  }
   const whereTxt = it => ZI[it.zone].name + (it.floor && ZI[it.zone].floors.length > 1 ? `, piso ${it.floor}` : '');
 
   /* Un solo sitio para la ficha: con la guía abierta en pantalla ancha se despliega dentro de ella;
@@ -334,20 +363,21 @@
   function renderPop() {
     const it = II[S.sel];
     if (!it || !popWanted()) { pop.hidden = true; pop.innerHTML = ''; return; }
-    const done = S.done.has(it.id), gs = it.t === 'gs';
+    const done = S.done.has(it.id), bean = it.t === 'bn';
     pop.className = 'pop ' + it.t;
     pop.innerHTML = `
       <button class="pop-x" aria-label="Cerrar la ficha">×</button>
-      <button class="pop-img" title="Ampliar la captura"><img src="${shot(it.id)}" alt="Captura del juego: ${esc(it.title)}" referrerpolicy="no-referrer" onerror="this.parentNode.remove()"></button>
+      ${bean ? '' : `<button class="pop-img" title="Ampliar la captura"><img src="${shot(it.id)}" alt="Captura del juego: ${esc(it.title)}" referrerpolicy="no-referrer" onerror="this.parentNode.remove()"></button>`}
       <div class="pop-body">
-        <p class="pop-kind"><svg viewBox="-17 -16 34 32" aria-hidden="true"><use href="#m-${it.t}"/></svg>${gs ? 'Skulltula dorada' : 'Pieza de corazón'} n.º ${it.n}, ${esc(whereTxt(it))}</p>
+        <p class="pop-kind"><svg viewBox="-17 -16 34 32" aria-hidden="true"><use href="#m-${it.t}"/></svg>${KIND[it.t]} n.º ${it.n}, ${esc(whereTxt(it))}</p>
         <h2>${esc(it.title)}</h2>
         <div class="tags">${tagsHTML(it)}</div>
         <p>${esc(it.desc)}</p>
+        ${givesHTML(it)}
         ${it.remake ? `<p class="rmk">${esc(it.remake)}</p>` : ''}
         <div class="pop-foot">
-          <label class="pop-chk"><input type="checkbox" ${done ? 'checked' : ''}> Ya la tengo</label>
-          <span class="pop-src">Captura de <a href="${SHOT[it.t][1]}" target="_blank" rel="noopener">${SHOT[it.t][0]}</a></span>
+          <label class="pop-chk"><input type="checkbox" ${done ? 'checked' : ''}> ${bean ? 'Ya la he plantado' : 'Ya la tengo'}</label>
+          ${bean ? '' : `<span class="pop-src">Captura de <a href="${SHOT[it.t][1]}" target="_blank" rel="noopener">${SHOT[it.t][0]}</a></span>`}
         </div>
       </div>`;
     pop.hidden = false; pop.scrollTop = 0;
@@ -370,23 +400,24 @@
 
   /* ── la guía (panel): índice por dominios o fichas con foto de la zona ── */
   function cardHTML(it) {
-    const done = S.done.has(it.id), sel = S.sel === it.id;
+    const done = S.done.has(it.id), sel = S.sel === it.id, bean = it.t === 'bn';
     return `<article class="card ${it.t}${done ? ' done' : ''}${sel ? ' sel' : ''}" data-id="${it.id}">
-      <button class="card-shot" aria-label="Ampliar la captura: ${esc(it.title)}"><img loading="lazy" width="760" height="428" src="${shot(it.id)}" alt="" referrerpolicy="no-referrer" onerror="this.parentNode.remove()"></button>
+      ${bean ? '' : `<button class="card-shot" aria-label="Ampliar la captura: ${esc(it.title)}"><img loading="lazy" width="760" height="428" src="${shot(it.id)}" alt="" referrerpolicy="no-referrer" onerror="this.parentNode.remove()"></button>`}
       <button class="card-head" title="Enseñármela en el mapa">
         <svg viewBox="-17 -16 34 32" aria-hidden="true"><use href="#m-${it.t}"/></svg>
         <span class="card-ttl"><i>${it.n}</i>${esc(it.title)}</span>
       </button>
-      <label class="chk" title="${done ? 'Conseguida' : 'Marcar como conseguida'}"><input type="checkbox" ${done ? 'checked' : ''} aria-label="Conseguida: ${esc(it.title)}"></label>
+      <label class="chk" title="${bean ? (done ? 'Plantada' : 'Marcar como plantada') : (done ? 'Conseguida' : 'Marcar como conseguida')}"><input type="checkbox" ${done ? 'checked' : ''} aria-label="${bean ? 'Plantada' : 'Conseguida'}: ${esc(it.title)}"></label>
       <div class="tags">${tagsHTML(it)}</div>
       <p class="card-desc">${esc(it.desc)}</p>
+      ${givesHTML(it)}
       ${it.remake ? `<p class="rmk">${esc(it.remake)}</p>` : ''}
     </article>`;
   }
 
   function indexHTML() {
     return REGIONS.map(r => {
-      const all = tally(ITEMS.filter(i => ZREG[i.zone] === r.id && S.show[i.t]));
+      const all = tally(ITEMS.filter(i => i.t !== 'bn' && ZREG[i.zone] === r.id && S.show[i.t]));
       const rows = r.z.map(id => {
         const z = ZI[id], t = tally(zoneItems(id));
         return `<button class="zrow${z.kind === 'dun' ? ' dun' : ''}${t.n && t.d === t.n ? ' full' : ''}" data-go="${id}">` +
@@ -423,7 +454,11 @@
         const li = items.filter(i => i.floor === f);
         if (li.length) html += `<h3 class="floor"><button data-floor="${f}">Piso ${f}</button><span>${li.length}</span></h3>` + li.map(cardHTML).join('');
       });
-    } else if (!S.q && z) html = items.map(cardHTML).join('');
+    } else if (!S.q && z) {
+      const beans = items.filter(i => i.t === 'bn');
+      html = items.filter(i => i.t !== 'bn').map(cardHTML).join('') +
+        (beans.length ? '<h3 class="floor">Para plantar de niño<span>judías mágicas</span></h3>' + beans.map(cardHTML).join('') : '');
+    }
     else {
       ZONES.forEach(zz => {
         const li = items.filter(i => i.zone === zz.id);
@@ -436,7 +471,7 @@
   function openShot(it) {
     const lb = $('#lightbox');
     $('img', lb).src = shot(it.id, 1280);
-    $('p', lb).textContent = `${it.t === 'gs' ? 'Skulltula dorada' : 'Pieza de corazón'} n.º ${it.n}: ${it.title}`;
+    $('p', lb).textContent = `${KIND[it.t]} n.º ${it.n}: ${it.title}`;
     lb.hidden = false;
   }
 
@@ -525,7 +560,7 @@
     if (S.done.has(id)) S.done.delete(id); else S.done.add(id);
     ls.set(KEY, [...S.done]);
     renderMarks(); refresh();
-    const c = $('.pop-chk input'); if (c && S.sel === id) c.checked = S.done.has(id);
+    const c = $('.pop-chk input'); if (c && S.sel === id) c.checked = S.done.has(id); else renderPop();
   }
 
   function togglePanel(on) {
@@ -607,6 +642,8 @@
 
   pop.addEventListener('click', e => {
     if (e.target.closest('.pop-x')) return deselect();
+    const rq = e.target.closest('[data-req]'); if (rq) return searchFor(REQ[rq.dataset.req]);
+    const sl = e.target.closest('[data-sel]'); if (sl) return select(sl.dataset.sel, { fly: true });
     if (e.target.closest('.pop-img') && S.sel) openShot(II[S.sel]);
   });
   pop.addEventListener('change', e => { if (e.target.matches('.pop-chk input') && S.sel) toggleDone(S.sel); });
@@ -615,6 +652,8 @@
   $('#list').addEventListener('click', e => {
     const g = e.target.closest('[data-go]'); if (g) return go(g.dataset.go);
     const f = e.target.closest('[data-floor]'); if (f) return go(S.view, f.dataset.floor);
+    const rq = e.target.closest('[data-req]'); if (rq) return searchFor(REQ[rq.dataset.req]);
+    const sl = e.target.closest('[data-sel]'); if (sl) return select(sl.dataset.sel, { fly: true });
     const card = e.target.closest('.card'); if (!card) return;
     if (e.target.closest('.card-shot')) return openShot(II[card.dataset.id]);
     if (e.target.closest('.card-head')) select(card.dataset.id, { fly: true });

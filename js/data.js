@@ -66,14 +66,14 @@ const REQ = {
   storms: 'Canción de la Tormenta', saria: 'Canción de Saria', sun: 'Canción del Sol', fire: 'Palo Deku o Fuego de Din',
   scale: 'Escama Dorada', cucco: 'Un cuco', bolero: 'Bolero del Fuego', requiem: 'Réquiem del Espíritu',
   rupees: '100 rupias', key: 'Llave pequeña', epona: 'Epona y el arco', bombchu: 'Saco de bombas', rod: 'Caña de pescar',
-  pass: 'Pase Gerudo', ocarina: 'Ocarina'
+  pass: 'Pase Gerudo', ocarina: 'Ocarina', seed: 'Una judía mágica'
 };
 
 const ITEMS = [];
 /* gs(n, edad, noche, requisitos, título, descripción, notaRemake)  edad: c niño · a adulto · x cualquiera */
 const add = t => (n, age, night, req, title, desc, remake) =>
   ITEMS.push({ id: t + n, t, n, age, night: !!night, req: req ? req.split(' ') : [], title, desc, remake: remake || '' });
-const gs = add('gs'), hp = add('hp');
+const gs = add('gs'), hp = add('hp'), bn = add('bn');
 
 /* ───────── Skulltulas doradas (100) ───────── */
 gs(1, 'c', 0, '', 'Hueco de la sala de la brújula', 'En el 3F, en la sala de las plataformas que suben con el interruptor (donde está la brújula). Cruza las plataformas hasta el hueco lateral de la izquierda: la skulltula está en la pared.');
@@ -214,3 +214,20 @@ hp(33, 'a', 0, 'bean', 'Planta mágica del coloso', 'La planta nacida ante el te
 hp(34, 'c', 0, '', 'El cofre de las dos épocas', 'Camino del territorio gerudo, bajo un saliente de roca, hay un cofre: de niño está sellado y de adulto, vacío. Lee de adulto la Nota de Hada que hay al lado y vuelve de niño para abrirlo.', 'Puzle nuevo del remake.');
 hp(35, 'c', 0, 'rupees', 'El Deku de la contraseña', 'A la derecha de la Ciudadela, en el lado del castillo del foso, hay un árbol solitario y una gruta. Lee de adulto la Nota de Hada para saber la contraseña («Sell somethin\', will ya?») y dísela de niño al Deku.', 'Puzle nuevo del remake. Respec la numera por error como «36».');
 hp(36, 'c', 0, 'rupees', 'El Deku del cráter', 'De niño no puedes salir de la zona del teletransporte, así que entra desde la cima con la vida llena. A la izquierda, bastante adentro, un Deku comerciante te la vende.', 'Es la pieza que antes estaba en la Caverna de Hielo.');
+
+/* ───────── Judías mágicas (10) ─────────
+   Se plantan de niño en la tierra blanda (la misma en la que se suelta el bicho de una skulltula)
+   y de adulto son una planta voladora. El vendedor está en el Río Zora y sube 10 rupias con cada una. */
+bn(1, 'c', 0, 'seed', 'Tierra blanda del cementerio', 'A la izquierda del cementerio, en la misma tierra blanda de la skulltula n.º 12. De adulto, la planta te sube a una zona a la que no se llega de otro modo.');
+bn(2, 'c', 0, 'seed', 'Tierra blanda del oeste del bosque', 'Desde la entrada por el Bosque Kokiri: izquierda y otra vez izquierda. Es la tierra blanda de la skulltula n.º 14.');
+bn(3, 'c', 0, 'seed', 'Tierra blanda ante la Caverna Dodongo', 'A la derecha de la boca de la caverna, en la tierra blanda de la skulltula n.º 15. De adulto, la planta te sube sobre la entrada.');
+bn(4, 'c', 0, 'seed', 'Tierra blanda junto al vendedor', 'Al lado del propio vendedor de judías, en la tierra blanda de la skulltula n.º 23. De adulto, la planta remonta el río hasta la meseta de las grutas.');
+bn(5, 'c', 0, 'seed', 'Tierra blanda del laboratorio', 'A la derecha de la puerta del Laboratorio del Lago, en la tierra blanda de la skulltula n.º 25. De adulto, la planta da una vuelta al lago y te deja en el tejado.');
+bn(6, 'c', 0, 'seed', 'Tierra blanda tras la tienda Kokiri', 'Detrás de la tienda, en la tierra blanda de la skulltula n.º 38.');
+bn(7, 'c', 0, 'seed', 'Tierra blanda del claro del teatro', 'Desde la entrada: derecha, izquierda, derecha, izquierda, izquierda. Es la tierra blanda de la skulltula n.º 39, en la esquina del fondo a la derecha.');
+bn(8, 'c', 0, 'seed cucco', 'Tierra blanda de la gerudo y la vaca', 'Baja planeando con el cuco hasta la orilla de la cascada y sigue el arroyo: es la tierra blanda de la skulltula n.º 41.');
+bn(9, 'c', 0, 'seed bolero', 'Tierra blanda del cráter', 'Llega de niño con el Bolero del Fuego: la tierra blanda está junto al pedestal (la de la skulltula n.º 60). Planta rápido, que te quemas.');
+bn(10, 'c', 0, 'seed requiem', 'Tierra blanda ante el Templo del Espíritu', 'Llega de niño con el Réquiem del Espíritu: a la izquierda de la entrada del templo, en la tierra blanda de la skulltula n.º 90.');
+
+/* Qué coleccionable depende de cada judía (según las guías consultadas) */
+const BEAN_GIVES = { bn1: ['hp17'], bn3: ['hp21'], bn4: ['gs61'], bn5: ['hp20'], bn7: ['gs44'], bn9: ['hp24'], bn10: ['hp33', 'gs94'] };

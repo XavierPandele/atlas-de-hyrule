@@ -9,7 +9,7 @@
    n x y texto                    nota clara, para escribir sobre el fondo oscuro de las mazmorras
    X x y destino texto            salida a otra zona
    T tamaño x y texto             título grande (solo en la base del gran mapa)
-   M id x y                       marcador (gs12, hp3…)
+   M id x y                       marcador (gs12 skulltula, hp3 pieza de corazón, bn4 judía mágica)
    Clases de terreno: gr hierba · g2 bosque · wt agua · w2 agua honda · pa camino · rk roca · r2 roca oscura
    sd arena · s2 arena oscura · lv lava · bd edificio · rb tejado azul · st piedra · wd madera · ic hielo
    fl suelo de mazmorra · f2 suelo alterno · vd vacío · sw pantano
@@ -72,6 +72,7 @@ X 440 82 lostwoods Bosque Perdido
 X 925 300 deku Gran Árbol Deku
 M gs13 182 530
 M gs38 832 158
+M bn6 790 198
 M gs43 818 446
 ` },
 
@@ -115,15 +116,17 @@ E wt 500 428 26 14
 l 500 482 Estanque (atajo al Río Zora)
 I soil 300 285
 I hole 345 290
-l 310 340 Claro del teatro del bosque
+l 310 354 Claro del teatro del bosque
 l 500 30 Para llegar al teatro: derecha, izquierda, derecha, izquierda, izquierda
 X 500 672 kokiri Bosque Kokiri
 X 880 130 sfm Pradera Sagrada
 X 770 425 goron Ciudad Goron
 M hp6 345 568
 M gs14 172 446
+M bn2 100 456
 M hp5 738 572
 M gs39 262 248
+M bn7 298 296
 M gs44 338 244
 ` },
 
@@ -350,7 +353,6 @@ I tree 268 142
 I soil 232 160
 I grave 700 180 1.3
 l 700 212 Tumba de Dampé
-I soil 118 520
 R rk 60 545 230 50
 l 150 575 Saliente elevado
 l 485 345 Hileras de tumbas
@@ -358,6 +360,7 @@ X 60 380 kakariko Kakariko
 X 900 130 shadow Templo de las Sombras
 M gs36 128 252
 M gs12 200 132
+M bn1 250 184
 M hp3 485 392
 M hp4 794 440
 M hp19 738 158
@@ -388,6 +391,7 @@ X 150 322 goron Ciudad Goron
 X 880 110 dmc Cráter
 M gs20 448 592
 M gs15 468 506
+M bn3 516 504
 M hp21 592 372
 M gs59 322 296
 M gs58 612 244
@@ -449,6 +453,7 @@ X 800 268 fire Templo del Fuego
 X 90 610 goron Ciudad Goron
 M gs22 232 124
 M gs60 552 432
+M bn9 506 444
 M hp24 672 464
 M hp22 561 652
 M hp36 132 352
@@ -479,6 +484,7 @@ l 952 205 Cascada
 X 60 462 field Llanura de Hyrule
 X 905 80 zdomain Región de los Zora
 M gs23 244 364
+M bn4 204 342
 M hp11 420 414
 M gs61 512 226
 M hp28 578 434
@@ -566,6 +572,7 @@ M gs73 158 184
 M hp27 276 128
 M gs32 312 222
 M gs25 348 150
+M bn5 364 190
 M gs72 562 366
 M hp14 878 256
 M gs33 136 584
@@ -605,6 +612,7 @@ X 940 330 field Llanura de Hyrule
 X 62 282 gfortress Fortaleza Gerudo
 M gs40 802 366
 M gs41 412 390
+M bn8 486 448
 M hp15 428 528
 M hp16 574 122
 M gs85 232 202
@@ -680,6 +688,7 @@ X 312 318 spirit Templo del Espíritu
 X 935 380 wasteland Desierto Encantado
 M gs89 332 170
 M gs90 300 468
+M bn10 254 478
 M hp33 612 284
 M gs94 628 526
 ` },

@@ -14,6 +14,10 @@ con el sitio exacto en el mapa, una foto y cómo conseguir cada una.
   arrastrando y con la rueda, o eligiendo la zona en el índice.
 - **Una ficha por coleccionable.** Foto del sitio con una flecha, explicación en español, si es de
   niño o de adulto, si solo sale de noche y qué objetos hacen falta.
+- **Te dice qué necesitas.** Cada ficha lleva su «Necesitas: …», y al pulsar un objeto ves todo
+  lo que lo pide en Hyrule: útil cuando acabas de conseguir el gancho o el bumerán.
+- **Las diez judías mágicas, marcadas.** Dónde se planta cada una, qué te da al volver de adulto
+  y un aviso en las fichas que dependen de ella si aún no la has plantado.
 - **Pensada para el remake.** Recoge lo que ha cambiado respecto a N64 y 3DS: la skulltula nueva
   junto al vendedor de judías, la pieza de corazón de la Caverna de Hielo que ahora vende un Deku
   en el cráter, los dos puzles nuevos de viaje en el tiempo…
