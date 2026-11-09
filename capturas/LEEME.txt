@@ -1,0 +1,12 @@
+Capturas locales (opcional)
+===========================
+
+El atlas carga la foto de cada ubicación desde la web de TheGamer (ver js/capturas.js).
+Esta carpeta sirve para usar copias locales en su lugar: si existe capturas/gs1.jpg,
+la página usa los archivos de aquí y funciona sin conexión.
+
+  gs1.jpg … gs100.jpg   skulltulas doradas (el número es el del marcador)
+  hp1.jpg … hp36.jpg    piezas de corazón
+
+Vale cualquier JPG de unos 800 px de ancho: por ejemplo, tus propias capturas del juego.
+Los .jpg de esta carpeta no se suben al repositorio (.gitignore).

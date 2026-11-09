@@ -1,0 +1,9 @@
+# Copias locales de las capturas: son de terceros y no se publican (ver CREDITS.md)
+capturas/*.jpg
+capturas/*.png
+
+# Sistema y editores
+.DS_Store
+Thumbs.db
+.vscode/
+.claude/

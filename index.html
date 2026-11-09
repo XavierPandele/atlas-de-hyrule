@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Atlas de Hyrule</title>
+<meta name="description" content="Guía interactiva del remake de Ocarina of Time: las 100 skulltulas doradas y las 36 piezas de corazón, zona a zona y mazmorra a mazmorra, con foto de cada sitio.">
+<meta property="og:title" content="Atlas de Hyrule">
+<meta property="og:description" content="Las 100 skulltulas doradas y las 36 piezas de corazón del remake de Ocarina of Time, con mapa, foto y explicación de cada una.">
+<meta property="og:image" content="docs/vista-general.png">
+<meta name="theme-color" content="#0b1424">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='%23e8b83a' d='M16 3l6.5 11.5h-13zM9.5 14.5L16 26H3zM22.5 14.5L29 26H16z'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="top">
+  <button class="brand" id="home" title="Ver todo Hyrule">
+    <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3l6.5 11.5h-13zM9.5 14.5L16 26H3zM22.5 14.5L29 26H16z"/></svg>
+    <span class="brand-txt">
+      <strong>Atlas de Hyrule</strong>
+      <small>Ocarina of Time, remake de Switch 2</small>
+    </span>
+  </button>
+
+  <div class="tally" aria-live="polite">
+    <div class="tally-item gs">
+      <svg viewBox="-16 -16 32 32" aria-hidden="true"><use href="#m-gs"/></svg>
+      <span><b id="t-gs">0</b> de 100 skulltulas</span>
+      <i class="bar"><i id="b-gs"></i></i>
+    </div>
+    <div class="tally-item hp">
+      <svg viewBox="-16 -16 32 32" aria-hidden="true"><use href="#m-hp"/></svg>
+      <span><b id="t-hp">0</b> de 36 corazones</span>
+      <i class="bar"><i id="b-hp"></i></i>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="seg" role="group" aria-label="Edad de Link">
+      <button data-age="x" aria-pressed="true">Todo</button>
+      <button data-age="c" aria-pressed="false">Niño</button>
+      <button data-age="a" aria-pressed="false">Adulto</button>
+    </div>
+    <button class="sky" id="sky" aria-pressed="false" title="Cambiar entre día y noche">
+      <svg viewBox="0 0 24 24" class="sun" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg>
+      <svg viewBox="0 0 24 24" class="moon" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/></svg>
+      <span id="sky-txt">Día</span>
+    </button>
+    <button class="tb-btn" id="panel-btn" aria-expanded="false" aria-controls="panel">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 4h12M2 8h12M2 12h12"/></svg>
+      <span id="panel-txt">Ocultar la guía</span>
+    </button>
+  </div>
+</header>
+
+<main>
+  <section id="stage">
+    <svg id="map" viewBox="0 0 8000 4260" preserveAspectRatio="xMidYMid meet" aria-label="Mapa de Hyrule"></svg>
+
+    <div class="where">
+      <button id="back" hidden>
+        <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M8 2L4 6l4 4"/></svg>
+        <span id="back-txt">Ver todo Hyrule</span>
+      </button>
+      <h1 id="z-name">Hyrule</h1>
+      <div id="floors" role="tablist" aria-label="Pisos"></div>
+    </div>
+
+    <div class="zoom">
+      <button id="z-in" aria-label="Acercar">+</button>
+      <button id="z-out" aria-label="Alejar">−</button>
+      <button id="z-fit" aria-label="Ver el mapa entero">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+      </button>
+    </div>
+
+    <article id="pop" hidden aria-live="polite"></article>
+  </section>
+
+  <aside id="panel" hidden aria-label="Guía de la zona">
+    <header id="guide-head"></header>
+    <div class="panel-head">
+      <input type="search" id="q" placeholder="Buscar en todo Hyrule: «árbol», «gancho»…" aria-label="Buscar ubicaciones">
+      <div class="chips">
+        <button class="chip gs" data-type="gs" aria-pressed="true">Skulltulas</button>
+        <button class="chip hp" data-type="hp" aria-pressed="true">Corazones</button>
+        <button class="chip" id="hide-done" aria-pressed="false">Solo las que faltan</button>
+      </div>
+    </div>
+    <div id="scroll">
+      <div id="list"></div>
+      <footer class="panel-foot">
+      <ul class="legend">
+      <li><svg viewBox="-16 -16 32 32"><use href="#m-gs"/></svg>Skulltula dorada</li>
+      <li><svg viewBox="-16 -16 32 32"><use href="#m-hp"/></svg>Pieza de corazón</li>
+      <li><svg viewBox="-9 -9 18 18"><use href="#m-moon"/></svg>Solo de noche</li>
+      <li><svg viewBox="-9 -9 18 18"><use href="#m-ok"/></svg>Ya la tienes</li>
+    </ul>
+
+        <p>Datos del remake de Switch 2 (noviembre de 2026) según
+          <a href="https://www.rpgsite.net/guide/21634-the-legend-zelda-ocarina-time-remake-gold-skulltula-locations-guide" target="_blank" rel="noopener">RPG Site</a>,
+          <a href="https://www.thegamer.com/the-legend-of-zelda-ocarina-of-time-all-gold-skulltula-locations/" target="_blank" rel="noopener">TheGamer</a> y
+          <a href="https://www.respec.net/guide/280-the-legend-zelda-ocarina-time-remake-pieces-heart-list-every-heart-piece-location-including-those-moved-for-switch-2" target="_blank" rel="noopener">Respec</a>.
+          Las capturas son de TheGamer y se cargan desde su web; los mapas son esquemas dibujados a mano. Tu progreso se guarda en este navegador.</p>
+        <button id="reset">Borrar mi progreso</button>
+      </footer>
+    </div>
+  </aside>
+</main>
+
+<div id="lightbox" hidden>
+  <img alt="" referrerpolicy="no-referrer">
+  <p></p>
+</div>
+
+<!-- Símbolos reutilizables: iconos del mapa y marcadores -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <!-- marcadores -->
+    <symbol id="m-gs" overflow="visible">
+      <g class="legs"><path d="M-9-6l-7-4M-10 0h-7M-9 6l-7 4M9-6l7-4M10 0h7M9 6l7 4"/></g>
+      <circle r="11.5" class="gs-body"/>
+      <path class="gs-face" d="M-4.6-2.6a2.1 2.1 0 1 0 .1 0zM4.6-2.6a2.1 2.1 0 1 0 .1 0zM0 2.2l-1.6 2.6h3.2zM-3.2 7.2h6.4"/>
+    </symbol>
+    <symbol id="m-hp" overflow="visible">
+      <path class="hp-body" d="M0 11.5C-14 2-12.5-9.5-6-10.5-2.6-11 0-8 0-6.4 0-8 2.6-11 6-10.5 12.500-9.500 14 2 0 11.5z"/>
+      <path class="hp-cut" d="M0-6.4V11M-11-1.5H0"/>
+    </symbol>
+    <symbol id="m-moon" overflow="visible">
+      <circle r="7" class="moon-bg"/>
+      <path class="moon-fg" d="M3.6 1.6A4.6 4.6 0 0 1-1.900-3.900a4.600 4.600 0 1 0 5.500 5.500z"/>
+    </symbol>
+    <symbol id="m-ok" overflow="visible">
+      <circle r="7" class="ok-bg"/>
+      <path class="ok-fg" d="M-3.500 0l2.500 2.600 4.500-5"/>
+    </symbol>
+
+    <!-- iconos de terreno (centrados en 0,0) -->
+    <symbol id="i-tree" overflow="visible">
+      <rect x="-2.500" y="6" width="5" height="9" rx="1.500" style="fill:var(--wd)"/>
+      <circle cy="-2" r="12" style="fill:var(--tree)"/>
+      <circle cx="-4" cy="-6" r="4.500" style="fill:var(--tree-hi)"/>
+    </symbol>
+    <symbol id="i-house" overflow="visible">
+      <rect x="-14" y="-2" width="28" height="17" rx="2" style="fill:var(--bd)"/>
+      <path d="M-18-1L0-17 18-1z" style="fill:var(--roof)"/>
+      <rect x="-3.500" y="5" width="7" height="10" style="fill:var(--wd)"/>
+    </symbol>
+    <symbol id="i-hut" overflow="visible">
+      <rect x="-11" y="-1" width="22" height="14" rx="2" style="fill:var(--bd)"/>
+      <path d="M-15 0L0-13 15 0z" style="fill:var(--wd)"/>
+    </symbol>
+    <symbol id="i-rock" overflow="visible">
+      <path d="M-11 8l-3-9 7-9 10-1 9 8-2 11z" style="fill:var(--st)"/>
+      <path d="M-7-10l5 6 5-7" style="fill:none;stroke:var(--ink);stroke-opacity:.35;stroke-width:1.500"/>
+    </symbol>
+    <symbol id="i-grave" overflow="visible">
+      <path d="M-8 11V-4a8 8 0 0 1 16 0v15z" style="fill:var(--st)"/>
+      <path d="M0-6v10M-4-2h8" style="fill:none;stroke:var(--ink);stroke-opacity:.45;stroke-width:1.800"/>
+    </symbol>
+    <symbol id="i-torch" overflow="visible">
+      <rect x="-3" y="-1" width="6" height="12" style="fill:var(--wd)"/>
+      <path d="M0-12c5 5 5 9 0 11-5-2-5-6 0-11z" style="fill:#f2a23a"/>
+    </symbol>
+    <symbol id="i-chest" overflow="visible">
+      <rect x="-10" y="-7" width="20" height="15" rx="2.500" style="fill:var(--wd)"/>
+      <path d="M-10-1h20" style="stroke:#f0cf6a;stroke-width:2.500"/>
+      <rect x="-2" y="-3" width="4" height="5" style="fill:#f0cf6a"/>
+    </symbol>
+    <symbol id="i-soil" overflow="visible">
+      <ellipse rx="11" ry="7" style="fill:#8a623a"/>
+      <ellipse rx="4" ry="2.500" style="fill:#3b2a18"/>
+    </symbol>
+    <symbol id="i-hole" overflow="visible">
+      <ellipse rx="11" ry="7" style="fill:#1b1f1c"/>
+      <ellipse rx="11" ry="7" style="fill:none;stroke:var(--st);stroke-width:2.500"/>
+    </symbol>
+    <symbol id="i-ladder" overflow="visible">
+      <path d="M-5-13v26M5-13v26M-5-8h10M-5-2h10M-5 4h10M-5 10h10" style="fill:none;stroke:var(--wd);stroke-width:2.600"/>
+    </symbol>
+    <symbol id="i-vines" overflow="visible">
+      <rect x="-10" y="-13" width="20" height="26" rx="3" style="fill:var(--g2)"/>
+      <path d="M-5-13c4 6-4 12 0 26M4-13c4 7-4 13 0 26" style="fill:none;stroke:var(--tree-hi);stroke-width:2"/>
+    </symbol>
+    <symbol id="i-crate" overflow="visible">
+      <rect x="-9" y="-9" width="18" height="18" rx="1.500" style="fill:var(--wd)"/>
+      <path d="M-9-9l18 18M9-9l-18 18" style="stroke:var(--ink);stroke-opacity:.35;stroke-width:1.500"/>
+    </symbol>
+    <symbol id="i-boss" overflow="visible">
+      <path d="M0-14l12 7v14l-12 7-12-7V-7z" style="fill:#7a2331"/>
+      <path d="M-5-3a2.200 2.200 0 1 0 .1 0zM5-3a2.200 2.200 0 1 0 .1 0zM-4 6h8" style="fill:#f3d9c0;stroke:#f3d9c0;stroke-width:1.500"/>
+    </symbol>
+    <symbol id="i-skull" overflow="visible">
+      <path d="M-13 2a13 12 0 1 1 26 0c0 5-3 6-5 7v5h-16v-5c-2-1-5-2-5-7z" style="fill:var(--st)"/>
+      <circle cx="-5" cy="1" r="3.200" style="fill:#1b1f1c"/><circle cx="5" cy="1" r="3.200" style="fill:#1b1f1c"/>
+    </symbol>
+    <symbol id="i-warp" overflow="visible">
+      <ellipse rx="13" ry="8" style="fill:var(--st)"/>
+      <path d="M0-5l4.500 7h-9z" style="fill:#e8b83a"/>
+    </symbol>
+    <symbol id="i-scare" overflow="visible">
+      <path d="M0-4v17M-10 0h20" style="fill:none;stroke:var(--wd);stroke-width:3"/>
+      <circle cy="-8" r="5" style="fill:#e3c27a"/>
+      <path d="M-7-12h14l-7-7z" style="fill:#8a4a2e"/>
+    </symbol>
+    <symbol id="i-tent" overflow="visible">
+      <path d="M-16 12L0-13l16 25z" style="fill:#e9dcc0"/>
+      <path d="M0-13v25" style="stroke:var(--wd);stroke-width:2"/>
+    </symbol>
+    <symbol id="i-block" overflow="visible">
+      <rect x="-9" y="-9" width="18" height="18" rx="2" style="fill:#5f86b8"/>
+      <rect x="-4.500" y="-4.500" width="9" height="9" style="fill:none;stroke:#dbe7f5;stroke-width:1.500"/>
+    </symbol>
+    <symbol id="i-fairy" overflow="visible">
+      <circle r="6" style="fill:#f6c1dc"/>
+      <path d="M-5-3c-9-9-13 1-6 5zM5-3c9-9 13 1 6 5z" style="fill:#fdf0f7;fill-opacity:.9"/>
+    </symbol>
+    <symbol id="i-pillar" overflow="visible">
+      <rect x="-6" y="-12" width="12" height="24" rx="2" style="fill:var(--st)"/>
+      <path d="M-8-12h16M-8 12h16" style="stroke:var(--ink);stroke-opacity:.4;stroke-width:2.500"/>
+    </symbol>
+    <symbol id="i-target" overflow="visible">
+      <circle r="11" style="fill:#f1ead8"/><circle r="7" style="fill:#c8473f"/><circle r="3" style="fill:#f1ead8"/>
+    </symbol>
+    <symbol id="i-web" overflow="visible">
+      <path d="M-13 0h26M0-13v26M-9-9l18 18M9-9l-18 18" style="fill:none;stroke:#f3efe2;stroke-opacity:.8;stroke-width:1.200"/>
+      <circle r="5" style="fill:none;stroke:#f3efe2;stroke-opacity:.8;stroke-width:1.200"/><circle r="10" style="fill:none;stroke:#f3efe2;stroke-opacity:.8;stroke-width:1.200"/>
+    </symbol>
+    <symbol id="i-statue" overflow="visible">
+      <path d="M-7 14V0a7 8 0 0 1 14 0v14z" style="fill:#b9a57c"/>
+      <circle cy="-9" r="5.500" style="fill:#b9a57c"/>
+      <path d="M-7 4l-8-5M7 4l8-5" style="stroke:#b9a57c;stroke-width:4;stroke-linecap:round"/>
+    </symbol>
+    <symbol id="i-boat" overflow="visible">
+      <path d="M-15-3h30l-6 10h-18z" style="fill:var(--wd)"/>
+      <path d="M0-3v-11l8 8z" style="fill:#d9d2c0"/>
+    </symbol>
+    <symbol id="i-pot" overflow="visible">
+      <path d="M-6-11h12v4c6 3 7 14 0 18h-12c-7-4-6-15 0-18z" style="fill:#b5653f"/>
+      <path d="M-8 0h16" style="stroke:#f0cf6a;stroke-width:2"/>
+    </symbol>
+    <symbol id="i-well" overflow="visible">
+      <ellipse rx="11" ry="8" style="fill:var(--st)"/>
+      <ellipse rx="6.500" ry="4.500" style="fill:#1f3a4d"/>
+    </symbol>
+    <symbol id="i-mill" overflow="visible">
+      <rect x="-8" y="-4" width="16" height="19" rx="2" style="fill:var(--bd)"/>
+      <path d="M0-6L-13-17M0-6L13-17M0-6L-13 5M0-6L13 5" style="stroke:var(--wd);stroke-width:3.500;stroke-linecap:round"/>
+    </symbol>
+    <symbol id="i-stump" overflow="visible">
+      <ellipse cy="4" rx="10" ry="6" style="fill:#7a5630"/>
+      <ellipse cy="-1" rx="10" ry="6" style="fill:#c9a36a"/>
+      <ellipse cy="-1" rx="4.500" ry="2.600" style="fill:none;stroke:#7a5630;stroke-width:1.200"/>
+    </symbol>
+    <symbol id="i-scrub" overflow="visible">
+      <circle cy="3" r="8" style="fill:#7a5a2c"/>
+      <path d="M-9-2c1-9 5-11 9-12 4 1 8 3 9 12z" style="fill:#4f8a3a"/>
+      <circle cy="5" r="2.500" style="fill:#2a1c0c"/>
+    </symbol>
+    <symbol id="i-cow" overflow="visible">
+      <ellipse rx="10" ry="7" style="fill:#f4f0e6"/>
+      <circle cx="-3" cy="-1" r="3.200" style="fill:#3a332c"/><circle cx="5" cy="3" r="2.400" style="fill:#3a332c"/>
+    </symbol>
+    <symbol id="i-compass" overflow="visible">
+      <circle r="250" style="fill:none;stroke:var(--ink);stroke-opacity:.35;stroke-width:10"/>
+      <circle r="200" style="fill:none;stroke:var(--ink);stroke-opacity:.2;stroke-width:5"/>
+      <path d="M0-330L52-52 330 0 52 52 0 330-52 52-330 0-52-52z" style="fill:var(--pa);stroke:var(--ink);stroke-opacity:.5;stroke-width:8;stroke-linejoin:round"/>
+      <path d="M0-330L52-52-52-52zM0 330L52 52-52 52z" style="fill:var(--roof)"/>
+      <text y="-360" style="font-size:120px;font-weight:800;text-anchor:middle;font-family:Alegreya,Georgia,serif;fill:var(--ink);fill-opacity:.7">N</text>
+    </symbol>
+  </defs>
+</svg>
+
+<script src="js/data.js"></script>
+<script src="js/capturas.js"></script>
+<script src="js/maps.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
